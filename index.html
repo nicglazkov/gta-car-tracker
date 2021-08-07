@@ -73,9 +73,10 @@
         const MS_IN_HOUR = 1000 * 60 * 60;
         const MS_IN_MINUTE = 1000 * 60;
         const MS_IN_SECOND = 1000;
-        const INITIAL_TIMER_VALUE = "2:30:00"; 
-        const INITIAL_COUNTER_VALUE = ""
-        let startTime = new Date(window.localStorage.getItem("startTime"));
+        const INITIAL_TIMER_VALUE = "2:30:00";
+        const INITIAL_COUNTER_VALUE = "";
+        let startTimes = getStartTimes();
+        let startTime = startTimes[0];
         let counter = window.localStorage.getItem("counter");
         let counterDiv = document.querySelector("div#counter");
         counterDiv.textContent = counter;
@@ -91,7 +92,8 @@
             counter++;
             startTime = new Date();
             window.localStorage.setItem("counter", counter);
-            window.localStorage.setItem("startTime", startTime);
+            startTimes = [ startTime ];
+            setStartTimes(startTimes);
             counterDiv.textContent = counter;
             soldButton.disabled = true;
         });
@@ -99,6 +101,20 @@
 
         updateRender();
         window.setInterval(updateRender, 1000);
+
+        function getStartTimes() {
+            let rawList = JSON.parse(window.localStorage.getItem("startTimes"));
+            if (!rawList) {
+                return [ new Date(0) ];
+            }
+            let listOfDates = rawList.map(value => new Date(value));
+            console.log(listOfDates);
+            return listOfDates;
+        }
+
+        function setStartTimes(value) {
+            window.localStorage.setItem("startTimes", JSON.stringify(startTimes));
+        }
 
         function updateRender() {
             let elapsed = DURATION - (new Date() - startTime);
